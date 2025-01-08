@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple and minimalistic online writing tool to help you focus.">
+  <meta name="keywords" content="writing, writing tool, distraction-free, online writing, minimalist">
+  <meta name="author" content="WriteItLikeItShot">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="JustWrite - A Minimalist Writing Tool">
+  <meta property="og:description" content="A simple and distraction-free writing platform to help you focus.">
+  <meta property="og:image" content="URL_TO_YOUR_IMAGE">
+  <meta property="og:url" content="YOUR_WEBSITE_URL">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:title" content="JustWrite - A Minimalist Writing Tool">
+  <meta name="twitter:description" content="A simple and distraction-free writing platform to help you focus.">
+  <meta name="twitter:image" content="URL_TO_YOUR_IMAGE">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>JustWrite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@400;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f7f7f7;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Controls */
+    .controls {
+      position: absolute;
+      top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      width: 100%;
+    }
+
+    /* Font Buttons */
+    .font-button {
+      font-size: 18px;
+      padding: 10px 20px;
+      cursor: pointer;
+      background: transparent;
+      border: 2px solid transparent;
+      transition: border-color 0.3s;
+      font-weight: 500;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 25px;
+    }
+
+    .font-button:hover {
+      border-color: #aaa;
+    }
+
+    .font-button.active {
+      border-color: #aaa;
+    }
+
+    .font-button span {
+      font-family: inherit;
+    }
+
+    /* Dark Mode Toggle Button */
+    .toggle-btn {
+      width: 35px;
+      height: 35px;
+      background-color: transparent;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+    }
+
+    /* Moon and Sun icons */
+    .toggle-btn svg {
+      fill: #aaa;
+      width: 20px;
+      height: 20px;
+    }
+
+    .toggle-btn:hover {
+      background-color: transparent;
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      background-color: black;
+      color: white;
+    }
+
+    body.dark-mode .toggle-btn svg {
+      fill: white;
+    }
+
+    body.dark-mode .controls button, body.dark-mode .controls select {
+      background-color: #333;
+      color: white;
+    }
+
+    body.dark-mode .controls button:hover, body.dark-mode .controls select:hover {
+      background-color: #444;
+    }
+
+    /* Writing Area */
+    .textarea-container {
+      position: relative;
+      width: 80%;
+      height: 60%;
+      max-width: 900px;
+      max-height: 600px;
+      display: flex;
+      justify-content: flex-start;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      font-size: 18px;
+      font-family: inherit;
+      color: inherit;
+      padding: 20px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      z-index: 0;
+    }
+
+    textarea::placeholder {
+      color: gray;
+      font-style: italic;
+    }
+
+    /* Counters */
+    .counter-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      width: 100%;
+      padding-top: 20px;
+      font-size: 18px;
+      color: #aaa;
+    }
+
+    .counter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    body.dark-mode .counter-container {
+      color: #ccc;
+    }
+
+    /* Font Selection */
+    #activeFont {
+      font-size: 20px;
+      color: #aaa;
+      margin-top: 10px;
+      font-weight: 500;
+      text-align: center;
+      font-family: inherit;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background-color: transparent;
+      border: 2px solid #aaa;
+      border-radius: 25px;
+      width: 300px;
+      height: 40px;
+      transition: border-color 0.3s;
+    }
+
+    /* Custom scrollbar */
+    textarea::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+      background-color: #aaa;
+      border-radius: 10px;
+      border: 2px solid transparent;
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+      background-color: #888;
+    }
+
+    textarea::-webkit-scrollbar-track {
+      background-color: transparent;
+      border-radius: 10px;
+    }
+
+    /* Media Queries for Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        font-size: 16px;
+      }
+
+      .textarea-container {
+        width: 90%;
+        height: 50%;
+      }
+
+      textarea {
+        font-size: 16px;
+        padding: 15px;
+      }
+
+      .counter-container {
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .controls {
+        gap: 15px;
+      }
+
+      .font-button {
+        font-size: 16px;
+        padding: 8px 16px;
+      }
+
+      textarea {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .counter-container {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Controls -->
+  <div class="controls">
+    <div class="font-button active" id="fontInter" style="font-family: 'Inter', sans-serif;">
+      <span>Inter</span>
+    </div>
+    <div class="font-button" id="fontMontserrat" style="font-family: 'Montserrat', sans-serif;">
+      <span>Montserrat</span>
+    </div>
+    <div class="font-button" id="fontMerriweather" style="font-family: 'Merriweather', serif;">
+      <span>Merriweather</span>
+    </div>
+
+    <div class="toggle-btn" id="darkModeToggle">
+      <!-- SVG Sun Icon for Light Mode -->
+      <svg id="darkModeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Counters -->
+  <div class="counter-container">
+    <div class="counter">
+      <span id="wordCount">Words: 0</span>
+    </div>
+    <div class="counter">
+      <span id="charCount">Characters: 0</span>
+    </div>
+  </div>
+
+  <!-- Textarea -->
+  <div class="textarea-container">
+    <textarea id="writingArea" placeholder="Start writing here..."></textarea>
+  </div>
+
+  <script>
+    const textarea = document.getElementById('writingArea');
+    const wordCount = document.getElementById('wordCount');
+    const charCount = document.getElementById('charCount');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    // Dark Mode Toggle
+    darkModeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      document.getElementById('darkModeIcon').classList.toggle('dark-mode');
+    });
+
+    // Font Selection
+    const fontButtons = document.querySelectorAll('.font-button');
+    fontButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        fontButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const font = button.id.replace('font', '');
+        document.body.style.fontFamily = font;
+      });
+    });
+
+    // Word and Character Count
+    textarea.addEventListener('input', () => {
+      const text = textarea.value.trim();
+      const words = text.split(/\s+/).filter(word => word.length > 0).length;
+      const chars = text.length;
+      wordCount.textContent = `Words: ${words}`;
+      charCount.textContent = `Characters: ${chars}`;
+    });
+  </script>
+</body>
+</html>

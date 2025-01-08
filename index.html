@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JustWrite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@400;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f7f7f7; /* Slightly darker white in light mode */
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Controls */
+    .controls {
+      position: absolute;
+      top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      width: 100%;
+    }
+
+    /* Font Buttons */
+    .font-button {
+      font-size: 18px;
+      padding: 10px 20px;
+      cursor: pointer;
+      background: transparent;
+      border: 2px solid transparent;
+      transition: border-color 0.3s;
+      font-weight: 500;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 25px;
+    }
+
+    .font-button:hover {
+      border-color: #aaa;
+    }
+
+    .font-button.active {
+      border-color: #aaa;
+    }
+
+    .font-button span {
+      font-family: inherit;
+    }
+
+    /* Dark Mode Toggle Button */
+    .toggle-btn {
+      width: 35px;
+      height: 35px;
+      background-color: transparent;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+    }
+
+    /* Moon and Sun icons */
+    .toggle-btn svg {
+      fill: #aaa;
+      width: 20px;
+      height: 20px;
+    }
+
+    .toggle-btn:hover {
+      background-color: transparent;
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      background-color: black;
+      color: white;
+    }
+
+    body.dark-mode .toggle-btn svg {
+      fill: white; /* Change icon color in dark mode */
+    }
+
+    body.dark-mode .controls button, body.dark-mode .controls select {
+      background-color: #333;
+      color: white;
+    }
+
+    body.dark-mode .controls button:hover, body.dark-mode .controls select:hover {
+      background-color: #444;
+    }
+
+    /* Writing Area */
+    .textarea-container {
+      position: relative;
+      width: 80%;
+      height: 60%;
+      max-width: 900px;
+      max-height: 600px;
+      display: flex;
+      justify-content: flex-start;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      font-size: 18px;
+      font-family: inherit;
+      color: inherit;
+      padding: 20px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      z-index: 0;
+    }
+
+    textarea::placeholder {
+      color: gray;
+      font-style: italic;
+    }
+
+    /* Counters */
+    .counter-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      width: 100%;
+      padding-top: 20px;
+      font-size: 18px;
+      color: #aaa; /* Light grey */
+    }
+
+    .counter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Dark Mode */
+    body.dark-mode .counter-container {
+      color: #ccc;
+    }
+
+    /* Font Selection */
+    #activeFont {
+      font-size: 20px;
+      color: #aaa;
+      margin-top: 10px;
+      font-weight: 500;
+      text-align: center;
+      font-family: inherit;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background-color: transparent;
+      border: 2px solid #aaa;
+      border-radius: 25px;
+      width: 300px;
+      height: 40px;
+      transition: border-color 0.3s;
+    }
+
+    /* Custom scrollbar */
+    textarea::-webkit-scrollbar {
+      width: 8px; /* Width of the scrollbar */
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+      background-color: #aaa; /* Color of the scrollbar thumb */
+      border-radius: 10px; /* Round the scrollbar thumb */
+      border: 2px solid transparent; /* Add transparency around the thumb */
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+      background-color: #888; /* Darker color when hovering */
+    }
+
+    textarea::-webkit-scrollbar-track {
+      background-color: transparent; /* Transparent track */
+      border-radius: 10px; /* Round the scrollbar track */
+    }
+  </style>
+</head>
+<body>
+  <!-- Controls -->
+  <div class="controls">
+    <div class="font-button active" id="fontInter" style="font-family: 'Inter', sans-serif;">
+      <span>Inter</span>
+    </div>
+    <div class="font-button" id="fontMontserrat" style="font-family: 'Montserrat', sans-serif;">
+      <span>Montserrat</span>
+    </div>
+    <div class="font-button" id="fontMerriweather" style="font-family: 'Merriweather', serif;">
+      <span>Merriweather</span>
+    </div>
+
+    <div class="toggle-btn" id="darkModeToggle">
+      <!-- SVG Sun Icon for Light Mode -->
+      <svg id="darkModeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Counters -->
+  <div class="counter-container">
+    <div class="counter">
+      <span id="wordCount">Words: 0</span>
+    </div>
+    <div class="counter">
+      <span id="charCount">Characters: 0</span>
+    </div>
+  </div>
+
+  <!-- Writing Area -->
+  <div class="textarea-container">
+    <textarea id="writingArea" placeholder="Start typing..."></textarea>
+  </div>
+
+  <script>
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const darkModeIcon = document.getElementById('darkModeIcon');
+
+    darkModeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      if (body.classList.contains('dark-mode')) {
+        darkModeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />`; // Moon icon for dark mode
+      } else {
+        darkModeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />`; // Sun icon for light mode
+      }
+    });
+
+    // Font Buttons
+    const fontButtons = document.querySelectorAll('.font-button');
+    const writingArea = document.getElementById('writingArea');
+    const activeFont = document.getElementById('activeFont');
+
+    // Set default font as active
+    fontButtons[0].classList.add('active');
+    writingArea.style.fontFamily = fontButtons[0].style.fontFamily;
+
+    fontButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons
+        fontButtons.forEach(b => b.classList.remove('active'));
+
+        // Add active class to the clicked button
+        button.classList.add('active');
+
+        // Update font family
+        const selectedFont = button.style.fontFamily;
+        writingArea.style.fontFamily = selectedFont;
+      });
+    });
+
+    // Character and Word Count
+    const wordCountElement = document.getElementById('wordCount');
+    const charCountElement = document.getElementById('charCount');
+
+    writingArea.addEventListener('input', () => {
+      const text = writingArea.value.trim();
+
+      const wordCount = text.split(/\s+/).filter(Boolean).length;
+      const charCount = text.length;
+
+      wordCountElement.textContent = `Words: ${wordCount}`;
+      charCountElement.textContent = `Characters: ${charCount}`;
+    });
+  </script>
+</body>
+</html>
